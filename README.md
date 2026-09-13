@@ -62,7 +62,7 @@ Student.AdvisorID -> Professor.ProfID \
 Course.DepartmentCode -> Department.DeptCode \
 Department.ChairID -> Professor.ProfID \
 Enrollment.StudentID -> Student.StudentID \
-Enrollment.CourseID -> Course.CourseID \
+Enrollment.CourseID -> Course.CourseID
 
 </details>
 </details>
@@ -81,7 +81,7 @@ Enrollment.CourseID -> Course.CourseID \
      - Prescriptions track medications prescribed by doctors to patients, including dosage and instructions
      - Hospital Rooms are numbered	within departments (room 101 in Cardiology is different from room 101 in Neurology)
 
-**1. Identify all entities**  \
+**1. Identify all entities** 
 - Patient
 - Doctor
 - Department
@@ -90,19 +90,19 @@ Enrollment.CourseID -> Course.CourseID \
 - HospitalRoom
 
 **2. Identify all attributes for each entity	(classify	as simple, composite, multi-valued, or derived)**  \
-Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address consists of (Street, City, State, ZIP)
-Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple))
-Department (DeptCode(simple), Name(simple), Location(simple))
-Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple))
-Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple))
+Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address \ consists of (Street, City, State, ZIP) \
+Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple)) \
+Department (DeptCode(simple), Name(simple), Location(simple)) \
+Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple)) \
+Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple)) \
 HospitalRoom (RoomNumber(simple), DeptCode(simple))
 
 **3. Identify all relationships with their cardinalities (1:1, 1:N, M:N)**  \
-Patient 1 - N Appointment
-Doctor 1 - N Appointment
-Doctor 1 - N Prescription
-Patient 1 - N Prescription
-Department 1 - N Doctor
+Patient 1 - N Appointment \
+Doctor 1 - N Appointment \
+Doctor 1 - N Prescription \
+Patient 1 - N Prescription \
+Department 1 - N Doctor \
 Department 1 - N HostpitalRoom
 
 **4. Draw the complete ER diagram using proper notation**  \
@@ -114,7 +114,7 @@ Doctor -> DoctorID \
 Department -> DepartmentCode \
 Appointment -> AppointmentID \
 Prescription ->PrescriptionID \
-HospitalRoom -> (DepartmentCode, RoomNumber) \
+HospitalRoom -> (DepartmentCode, RoomNumber)
 
 </details>
 <details>
