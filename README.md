@@ -1,8 +1,10 @@
-# Database Systems Laboratory work1
+# Database Systems
+
+### Laboratory work1
 <details>
-<summary>Part 1</summary>  
+<summary>Part 1: Key Identification Exercises</summary>  
 <details>
-<summary>Task 1.1</summary>  
+<summary>Task 1.1: Superkey and Candidate Key Analysis</summary>  
 
 ### Relation A: Employee
      Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
@@ -44,8 +46,68 @@
 
 </details>
 <details>
-<summary>Task 1.2</summary>
+<summary>Task 1.2: Foreign Key Design</summary>
 
+### Relation C: University system 
+     Given Tables:
+     Student(StudentID, Name, Email, Major, AdvisorID)
+     Professor(ProfID, Name, Department, Salary)
+     Course(CourseID, Title, Credits, DepartmentCode)
+     Department(DeptCode, DeptName, Budget, ChairID)
+     Enrollment(StudentID, CourseID, Semester, Grade)
+
+**1. All foreign key:**  \
+1. Student.AdvisorID → Professor.ProfID
+2. Course.DepartmentCode → Department.DeptCode
+3. Department.ChairID → Professor.ProfID
+4. Enrollment.StudentID → Student.StudentID
+5. Enrollment.CourseID → Course.CourseID
 
 </details>
 </details>
+
+<details>
+<summary>Part 2: ER Diagram Construction</summary>  
+<details>
+<summary>Task 2.1: Hospital Management System</summary>
+
+### Relation D: Hospital management system
+     Requirements:
+     - Patients have unique patient IDs, names, birthdates, addresses	(street, city, state, zip), phone numbers (multiple allowed), and insurance information
+     - Doctors have unique doctor IDs, names, specializations (can have multiple), phone numbers, and office locations
+     - Departments have department codes, names, and locations
+     - Appointments track which patient sees which doctor at what date/time, the purpose of visit, and any notes
+     - Prescriptions track medications prescribed by doctors to patients, including dosage and instructions
+     - Hospital Rooms are numbered	within departments (room 101 in Cardiology is different from room 101 in Neurology)
+
+**1. Identify all entities**  \
+
+**2. Identify all attributes for each entity	(classify	as simple, composite, multi-valued, or derived)**  \
+
+**3. Identify all relationships with their cardinalities (1:1, 1:N, M:N)**  \
+
+**4. Draw the complete ER diagram using proper notation**  \
+
+**5. Mark primary keys**  \
+
+</details>
+<details>
+<summary>Task 2.2: E-commerce Platform</summary>
+
+### Relation D: Simplified e-commerce database
+     Requirements:
+     - "Customers" place "Orders" for "Products"
+     - "Products" belong to "Categories" and are supplied by "Vendors"
+     - "Orders" contain multiple "Order Items" (quantity and price at time of order)
+     - "Products" have reviews and ratings from customers
+     - Track "Inventory" levels for each product
+     - "Shipping addresses" can be different from customer billing addresses
+
+**1. Create a complete ER diagram**  \
+
+**2. Identify at least one weak entity and justify why it’s weak**  \
+
+**3. Identify at least one many-to-many relationship that needs attributes**  \
+
+</details>
+</details> 
