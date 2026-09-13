@@ -1,8 +1,8 @@
 # Database Systems Laboratory work1
 <details>
-<summary>Part1</summary>  
+<summary>Part 1</summary>  
 <details>
-<summary>task1.1</summary>  
+<summary>Task 1.1</summary>  
 
 ### Relation A: Employee
 Employee(EmpID, SSN, Email, Phone, Name, Department, Salary) 
@@ -32,14 +32,21 @@ Business Rules:
 - A student cannot register for the same course section in the same semester
 - Each course section in a semester has a fixed credit value
 
-**1. List at least 6 different superkeys**
-SuperKeys: EmpID, SSN, Phone, (EmpID, Salary), (EmpID, Email), (EmpID, SSN, Phone)
+**1. Determine the minimum attributes needed for the primary key**
+Minimum attributes needed for the primary key are (StudentID, CourseCode, Section, Semester, Year).
 
-**2. Identify	all	candidate	keys**
-Candidate Keys: EmpID, SSN, Phone
+**2. Explain why each attribute in your primary key is necessary**
+StudentID alone is not enough because one student can register for many courses.
+StudentID + CourseCode is not enough because a student can take the same course in different semesters.
+Section, Semester ans Year re needed to identify a specific course section in a specific semester.
 
-**3. Which candidate key would you choose as primary key and why?**
-I choose "EmpID". Because it is short, simple, immutable and invented by us.
+**3. Identify any additional candidate keys**
+There are no additional candidate keysbased on the given business rules.
+
+</details>
+<details>
+<summary>Task 1.2</summary>
+
 
 </details>
 </details>
