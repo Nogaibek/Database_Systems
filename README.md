@@ -1,7 +1,7 @@
 # Database Systems
 
 ### Laboratory work1
-<hr>
+
 <details>
 <summary>Part 1: Key Identification Exercises</summary>  
 <details>
@@ -58,11 +58,11 @@
      Enrollment(StudentID, CourseID, Semester, Grade)
 
 **1. All foreign key:**  \
-Student.AdvisorID -> Professor.ProfID
-Course.DepartmentCode -> Department.DeptCode
-Department.ChairID -> Professor.ProfID
-Enrollment.StudentID -> Student.StudentID
-Enrollment.CourseID -> Course.CourseID
+Student.AdvisorID -> Professor.ProfID \
+Course.DepartmentCode -> Department.DeptCode \
+Department.ChairID -> Professor.ProfID \
+Enrollment.StudentID -> Student.StudentID \
+Enrollment.CourseID -> Course.CourseID \
 
 </details>
 </details>
@@ -82,20 +82,45 @@ Enrollment.CourseID -> Course.CourseID
      - Hospital Rooms are numbered	within departments (room 101 in Cardiology is different from room 101 in Neurology)
 
 **1. Identify all entities**  \
+- Patient
+- Doctor
+- Department
+- Appointment
+- Prescription
+- HospitalRoom
 
 **2. Identify all attributes for each entity	(classify	as simple, composite, multi-valued, or derived)**  \
+Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address consists of (Street, City, State, ZIP)
+Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple))
+Department (DeptCode(simple), Name(simple), Location(simple))
+Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple))
+Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple))
+HospitalRoom (RoomNumber(simple), DeptCode(simple))
 
 **3. Identify all relationships with their cardinalities (1:1, 1:N, M:N)**  \
+Patient 1 - N Appointment
+Doctor 1 - N Appointment
+Doctor 1 - N Prescription
+Patient 1 - N Prescription
+Department 1 - N Doctor
+Department 1 - N HostpitalRoom
 
 **4. Draw the complete ER diagram using proper notation**  \
+I drew this in the file "erdplus_pic1.png"
 
 **5. Mark primary keys**  \
+Patient -> PatientID \
+Doctor -> DoctorID \
+Department -> DepartmentCode \
+Appointment -> AppointmentID \
+Prescription ->PrescriptionID \
+HospitalRoom -> (DepartmentCode, RoomNumber) \
 
 </details>
 <details>
 <summary>Task 2.2: E-commerce Platform</summary>
 
-### Relation D: Simplified e-commerce database
+### Relation E: Simplified e-commerce database
      Requirements:
      - "Customers" place "Orders" for "Products"
      - "Products" belong to "Categories" and are supplied by "Vendors"
