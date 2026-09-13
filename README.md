@@ -5,7 +5,7 @@
 <summary>Task 1.1</summary>  
 
 ### Relation A: Employee
- :Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
+     Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
 
 |  EmpID  |  SSN      |  Email         |  Phone   |  Name    |Department|  Salary  |
 |---------|-----------|----------------|----------|----------|----------|----------|
