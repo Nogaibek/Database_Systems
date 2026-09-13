@@ -1,6 +1,7 @@
 # Database Systems
 
 ### Laboratory work1
+<hr>
 <details>
 <summary>Part 1: Key Identification Exercises</summary>  
 <details>
@@ -57,11 +58,11 @@
      Enrollment(StudentID, CourseID, Semester, Grade)
 
 **1. All foreign key:**  \
-1. Student.AdvisorID → Professor.ProfID
-2. Course.DepartmentCode → Department.DeptCode
-3. Department.ChairID → Professor.ProfID
-4. Enrollment.StudentID → Student.StudentID
-5. Enrollment.CourseID → Course.CourseID
+Student.AdvisorID -> Professor.ProfID
+Course.DepartmentCode -> Department.DeptCode
+Department.ChairID -> Professor.ProfID
+Enrollment.StudentID -> Student.StudentID
+Enrollment.CourseID -> Course.CourseID
 
 </details>
 </details>
