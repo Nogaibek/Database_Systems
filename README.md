@@ -5,7 +5,7 @@
 <summary>Task 1.1</summary>  
 
 ### Relation A: Employee
-Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
+ :Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
 
 |  EmpID  |  SSN      |  Email         |  Phone   |  Name    |Department|  Salary  |
 |---------|-----------|----------------|----------|----------|----------|----------|
@@ -24,7 +24,7 @@ Employee(EmpID, SSN, Email, Phone, Name, Department, Salary)
 
 **4. Can two employees have the same phone number?**  \
      No, two employees cannot have the same phone number. Phone numbers are always different. As you can see, the table has a column "EmpID", which means that each employees has a unique ID.
-     
+
 ### Relation B: Course registration
      Registration(StudentID, CourseCode, Section, Semester, Year, Grade, Credits)
 
