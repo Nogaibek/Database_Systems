@@ -90,12 +90,12 @@ Enrollment.CourseID -> Course.CourseID
 - HospitalRoom
 
 **2. Identify all attributes for each entity	(classify	as simple, composite, multi-valued, or derived)**  \
-Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address \ consists of (Street, City, State, ZIP) \
-Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple)) \
-Department (DeptCode(simple), Name(simple), Location(simple)) \
-Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple)) \
-Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple)) \
-HospitalRoom (RoomNumber(simple), DeptCode(simple))
+(1)Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address consists of (Street, City, State, ZIP) \
+(2)Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple)) \
+(3)Department (DeptCode(simple), Name(simple), Location(simple)) \
+(4)Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple)) \
+(5)Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple)) \
+(6)HospitalRoom (RoomNumber(simple), DeptCode(simple))
 
 **3. Identify all relationships with their cardinalities (1:1, 1:N, M:N)**  \
 Patient 1 - N Appointment \
