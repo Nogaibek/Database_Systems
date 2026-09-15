@@ -264,5 +264,5 @@ Query 1: List all students who are members of a particular club. \
 Query 2: Show all upcoming events for a particular club and the rooms reserved for them. \
 Query 3: Find all club expenses for a given year and calculate the total amount spent by each club.
 
-<details>
-<details>
+</details>
+</details>
