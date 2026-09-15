@@ -213,9 +213,9 @@ if we know TimeSlot and Room, we know Building
 No, the table is not in BCNF. The primary key is (StudentID, CourseID). However, StudentID, CourseID, InstructorID, and (TimeSlot, Room) are not superkeys of the original relation, while they determine other attributes. Therefore, the table violates BCNF.
 
 **4. If not in BCNF, decompose it to BCNF showing your work** \
-Student(StudentID, StudentMajor) \ 
+Student(StudentID, StudentMajor) \
 Course(CourseID, CourseName, InstructorID, TimeSlot, Room) \
-Instructor(InstructorID, InstructorName) \ 
+Instructor(InstructorID, InstructorName) \
 RoomSchedule(TimeSlot, Room, Building) \
 Enrollment(StudentID, CourseID) 
 
@@ -246,7 +246,7 @@ I drew this in the file "erdplus_pic3.png"
 **2. Convert your ER diagram to a normalized relational schema** \
 (1) Student (StudentID PK, Name, Email) \
 (2) Faculty (FacultyID PK, Name, Department) \
-(3) Club (ClubID PK, ClubName, Description, AdvisorID FK) \ 
+(3) Club (ClubID PK, ClubName, Description, AdvisorID FK) \
 (4) Membership (StudentID PK/FK, ClubID PK/FK, JoinDate) \
 (5) Attendance (EventID PK/FK, StudentID PK/FK, AttendanceStatus) \
 (6) OfficerPosition (PositionID PK, PositionName) \
