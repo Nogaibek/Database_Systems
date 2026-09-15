@@ -90,12 +90,12 @@ Enrollment.CourseID -> Course.CourseID
 - HospitalRoom
 
 **2. Identify all attributes for each entity	(classify	as simple, composite, multi-valued, or derived)**  \
-(1)Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address consists of (Street, City, State, ZIP) \
-(2)Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple)) \
-(3)Department (DeptCode(simple), Name(simple), Location(simple)) \
-(4)Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple)) \
-(5)Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple)) \
-(6)HospitalRoom (RoomNumber(simple), DeptCode(simple))
+(1) Patient (PatientID(simple), Name(simple), BirthDate(simple), Address(composite), PhoneNumber(multi-valued), Insurance(simple)), where Address consists of (Street, City, State, ZIP) \
+(2) Doctor (DoctorID(simple), Name(simple), Specialization(multi-valued), phoneNumber(simple), OfficeLocation(simple)) \
+(3) Department (DeptCode(simple), Name(simple), Location(simple)) \
+(4) Appointment (AppointmentID, DateTime(simple), Purpose(simple), Notes(simple)) \
+(5) Prescription (PrescriptionID, Medication(simple), Dosage(simple), Instructions(simple)) \
+(6) HospitalRoom (RoomNumber(simple), DeptCode(simple))
 
 **3. Identify all relationships with their cardinalities (1:1, 1:N, M:N)**  \
 Patient 1 - N Appointment \
@@ -130,10 +130,111 @@ HospitalRoom -> (DepartmentCode, RoomNumber)
      - "Shipping addresses" can be different from customer billing addresses
 
 **1. Create a complete ER diagram**  \
+I drew this in the file "erdplus_pic2.png"
 
 **2. Identify at least one weak entity and justify why it’s weak**  \
+Weak entity is OrderItem, because it is depends on an Order for it is indentification.
 
 **3. Identify at least one many-to-many relationship that needs attributes**  \
+Many-to-many relationship is Product:Order, because one order can contain many products, and one product can appear in many orders.
+</details>
+</details>
+
+<details>
+<summary>Part 3: Normalization Workshop</summary>  
+<details>
+<summary>Task 3.1: Denormalized Table Analysis</summary>
+
+### Given table
+StudentProject(StudentID, StudentName, StudentMajor, ProjectID, 
+               ProjectTitle, ProjectType, SupervisorID, SupervisorName, 
+               SupervisorDept, Role, HoursWorked, StartDate, EndDate)
+
+**1. Identify functional dependencies**
+(1) StudentID -> StudentName, StudentMajor \
+(2) ProjectID -> ProjectTitle, ProjectType, SupervisorID, StartDate, EndDate \
+(3) SupervisorID -> SupervisorName, SupervisorDept \
+(4) (StudentID, ProjectID) -> Role, HoursWorked \
+
+**2. Identify problems: -What redundancy exists in this table? - Give specific examples of update, insert, and delete anomalies**
+(1) The table contains redundant student, project, and supervisor information. \
+(2) Update anomaly: changing a supervisor's department requires updating many rows. \
+(3) Insert anomaly: a new project cannot be easily inserted without a student. \
+(4) Delete anomaly: deleting the last student from a project may also delete project information. \
+
+**3. Apply 1NF: Are there any 1NF violations? How would you fix them?**
+There are no 1NF violations, assuming all attributes contain atomic values.
+
+**4. Apply 2NF: -What is the primary key of this table? -Identify any partial dependencies -Show the 2NF decomposition**
+Primary key: (StudentID, ProjectID).  
+Partial dependencies:  
+     (1) StudentID → StudentName, StudentMajor  
+     (2) ProjectID → ProjectTitle, ProjectType, SupervisorID, StartDate, EndDate  
+  
+- Student(StudentID, StudentName, StudentMajor)
+- Project(ProjectID, ProjectTitle, ProjectType,
+        SupervisorID, SupervisorName, SupervisorDept,
+        StartDate, EndDate)
+- StudentProject(StudentID, ProjectID, Role, HoursWorked)
+
+**5. Apply 3NF: -Identify any transitive dependencies -Show the final 3NF decomposition with all table schemas**
+Transitive dependency: ProjectID → SupervisorID → SupervisorName, SupervisorDept
+- Student(StudentID, StudentName, StudentMajor)
+- Supervisor(SupervisorID, SupervisorName, SupervisorDept)
+- Project(ProjectID, ProjectTitle, ProjectType,
+        SupervisorID, StartDate, EndDate)
+- StudentProject(StudentID, ProjectID, Role, HoursWorked)
 
 </details>
-</details> 
+<details>
+<summary>Task 3.2: Advanced Normalization</summary>
+
+### Given table
+CourseSchedule(StudentID, StudentMajor, CourseID, CourseName,
+               InstructorID, InstructorName, TimeSlot, Room, Building)
+Business Rules:
+• Each student has exactly one major
+• Each course has a fixed name
+• Each instructor has exactly one name
+• Each time slot in a room determines the building (rooms are unique across campus)
+• Each course section is taught by one instructor at one time in one room
+• A student can be enrolled in multiple course sections
+
+**1. Determine the primary key of this table (hint: this is tricky!)**
+
+**2. List all functional dependencies**
+
+**3. Check if the table is in BCNF**
+
+**4. If not in BCNF, decompose it to BCNF showing your work**
+
+**5. Explain any potential loss of information in your decomposition**
+
+</details>
+</details>
+
+<details>
+<summary>Part 4: Design Challenge</summary>  
+<details>
+<summary>Task 4.1: Real-World Application</summary>
+
+### Scenario: Your university wants to track student clubs and organizations with the following requirements:
+System Requirements:
+• Student clubs and organizations information
+• Club membership (students can join multiple clubs, clubs have multiple members)
+• Club events and student attendance tracking
+• Club officer positions (president, treasurer, secretary, etc.)
+• Faculty advisors for clubs (each club has one advisor, faculty can advise multiple clubs)
+• Room reservations for club events
+• Club budget and expense tracking
+
+**1. Create a complete ER diagram for this system**
+
+**2. Convert your ER diagram to a normalized relational schema**
+
+**3. Identify at least one design decision where you had multiple valid options and explain your choice**
+
+**4. Write 3 example queries that your database should support (in English, not SQL)**
+
+<details>
+<details>
