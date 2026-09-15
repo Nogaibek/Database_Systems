@@ -146,26 +146,26 @@ Many-to-many relationship is Product:Order, because one order can contain many p
 <summary>Task 3.1: Denormalized Table Analysis</summary>
 
 ### Given table
-StudentProject(StudentID, StudentName, StudentMajor, ProjectID, 
-               ProjectTitle, ProjectType, SupervisorID, SupervisorName, 
-               SupervisorDept, Role, HoursWorked, StartDate, EndDate)
+     StudentProject(StudentID, StudentName, StudentMajor, ProjectID, 
+                    ProjectTitle, ProjectType, SupervisorID, SupervisorName, 
+                    SupervisorDept, Role, HoursWorked, StartDate, EndDate)
 
-**1. Identify functional dependencies**
+**1. Identify functional dependencies** \
 (1) StudentID -> StudentName, StudentMajor \
 (2) ProjectID -> ProjectTitle, ProjectType, SupervisorID, StartDate, EndDate \
 (3) SupervisorID -> SupervisorName, SupervisorDept \
-(4) (StudentID, ProjectID) -> Role, HoursWorked \
+(4) (StudentID, ProjectID) -> Role, HoursWorked 
 
-**2. Identify problems: -What redundancy exists in this table? - Give specific examples of update, insert, and delete anomalies**
+**2. Identify problems: -What redundancy exists in this table? - Give specific examples of update, insert, and delete anomalies** \
 (1) The table contains redundant student, project, and supervisor information. \
 (2) Update anomaly: changing a supervisor's department requires updating many rows. \
 (3) Insert anomaly: a new project cannot be easily inserted without a student. \
-(4) Delete anomaly: deleting the last student from a project may also delete project information. \
+(4) Delete anomaly: deleting the last student from a project may also delete project information. 
 
-**3. Apply 1NF: Are there any 1NF violations? How would you fix them?**
+**3. Apply 1NF: Are there any 1NF violations? How would you fix them?** \
 There are no 1NF violations, assuming all attributes contain atomic values.
 
-**4. Apply 2NF: -What is the primary key of this table? -Identify any partial dependencies -Show the 2NF decomposition**
+**4. Apply 2NF: -What is the primary key of this table? -Identify any partial dependencies -Show the 2NF decomposition** \
 Primary key: (StudentID, ProjectID).  
 Partial dependencies:  
      (1) StudentID → StudentName, StudentMajor  
@@ -177,7 +177,7 @@ Partial dependencies:
         StartDate, EndDate)
 - StudentProject(StudentID, ProjectID, Role, HoursWorked)
 
-**5. Apply 3NF: -Identify any transitive dependencies -Show the final 3NF decomposition with all table schemas**
+**5. Apply 3NF: -Identify any transitive dependencies -Show the final 3NF decomposition with all table schemas** \
 Transitive dependency: ProjectID → SupervisorID → SupervisorName, SupervisorDept
 - Student(StudentID, StudentName, StudentMajor)
 - Supervisor(SupervisorID, SupervisorName, SupervisorDept)
@@ -190,25 +190,37 @@ Transitive dependency: ProjectID → SupervisorID → SupervisorName, Supervisor
 <summary>Task 3.2: Advanced Normalization</summary>
 
 ### Given table
-CourseSchedule(StudentID, StudentMajor, CourseID, CourseName,
-               InstructorID, InstructorName, TimeSlot, Room, Building)
-Business Rules:
-• Each student has exactly one major
-• Each course has a fixed name
-• Each instructor has exactly one name
-• Each time slot in a room determines the building (rooms are unique across campus)
-• Each course section is taught by one instructor at one time in one room
-• A student can be enrolled in multiple course sections
+     CourseSchedule(StudentID, StudentMajor, CourseID, CourseName,
+                    InstructorID, InstructorName, TimeSlot, Room, Building)
+     Business Rules:
+     - Each student has exactly one major
+     - Each course has a fixed name
+     - Each instructor has exactly one name
+     - Each time slot in a room determines the building (rooms are unique across campus)
+     - Each course section is taught by one instructor at one time in one room
+     - A student can be enrolled in multiple course sections
 
-**1. Determine the primary key of this table (hint: this is tricky!)**
+**1. Determine the primary key of this table (hint: this is tricky!)** \
+Primary key (StudentID, CourseID). Because StudentID detemines room, timeSlot, instructor
 
-**2. List all functional dependencies**
+**2. List all functional dependencies** \
+if we know StudentID, we know StudentMajor \
+if we know CourseID, we know CourseName, InstructorID, TimeSlot, Room \
+if we know InstructorID, we know InstructorName \
+if we know TimeSlot and Room, we know Building
 
-**3. Check if the table is in BCNF**
+**3. Check if the table is in BCNF** \
+No, the table is not in BCNF. The primary key is (StudentID, CourseID). However, StudentID, CourseID, InstructorID, and (TimeSlot, Room) are not superkeys of the original relation, while they determine other attributes. Therefore, the table violates BCNF.
 
-**4. If not in BCNF, decompose it to BCNF showing your work**
+**4. If not in BCNF, decompose it to BCNF showing your work** \
+Student(StudentID, StudentMajor) \ 
+Course(CourseID, CourseName, InstructorID, TimeSlot, Room) \
+Instructor(InstructorID, InstructorName) \ 
+RoomSchedule(TimeSlot, Room, Building) \
+Enrollment(StudentID, CourseID) 
 
-**5. Explain any potential loss of information in your decomposition**
+**5. Explain any potential loss of information in your decomposition** \
+The decomposition is lossless as long as the tables are joined using their common attributes (StudentID, CourseID, and TimeSlot + Room). No information is lost because all original attributes can be reconstructed from the decomposed relations.
 
 </details>
 </details>
@@ -219,22 +231,38 @@ Business Rules:
 <summary>Task 4.1: Real-World Application</summary>
 
 ### Scenario: Your university wants to track student clubs and organizations with the following requirements:
-System Requirements:
-• Student clubs and organizations information
-• Club membership (students can join multiple clubs, clubs have multiple members)
-• Club events and student attendance tracking
-• Club officer positions (president, treasurer, secretary, etc.)
-• Faculty advisors for clubs (each club has one advisor, faculty can advise multiple clubs)
-• Room reservations for club events
-• Club budget and expense tracking
+     System Requirements:
+     - Student clubs and organizations information
+     - Club membership (students can join multiple clubs, clubs have multiple members)
+     - Club events and student attendance tracking
+     - Club officer positions (president, treasurer, secretary, etc.)
+     - Faculty advisors for clubs (each club has one advisor, faculty can advise multiple clubs)
+     - Room reservations for club events
+     - Club budget and expense tracking
 
-**1. Create a complete ER diagram for this system**
+**1. Create a complete ER diagram for this system** \
+I drew this in the file "erdplus_pic3.png"
 
-**2. Convert your ER diagram to a normalized relational schema**
+**2. Convert your ER diagram to a normalized relational schema** \
+(1) Student (StudentID PK, Name, Email) \
+(2) Faculty (FacultyID PK, Name, Department) \
+(3) Club (ClubID PK, ClubName, Description, AdvisorID FK) \ 
+(4) Membership (StudentID PK/FK, ClubID PK/FK, JoinDate) \
+(5) Attendance (EventID PK/FK, StudentID PK/FK, AttendanceStatus) \
+(6) OfficerPosition (PositionID PK, PositionName) \
+(7) ClubOfficer (ClubID PK/FK, StudentID PK/FK, PositionID FK, StartDate, EndDate) \
+(8) Room (RoomID PK, Building, RoomNumber, Capacity) \
+(9) Reservation (ReservationID PK, EventID FK, RoomID FK, StartDateTime, EndDateTime) \
+(10) Budget (BudgetID PK, ClubID FK, Amount, FiscalYear) \
+(11) Expense (ExpenseID PK, ClubID FK, Amount, ExpenseDate,Description)
 
-**3. Identify at least one design decision where you had multiple valid options and explain your choice**
+**3. Identify at least one design decision where you had multiple valid options and explain your choice** \
+I chose to store officer positions in a separate table because it avoids repeating the same position names and makes it easier to add new positions later. "OfficerPosition (PositionID PK, PositionName)"
 
-**4. Write 3 example queries that your database should support (in English, not SQL)**
+**4. Write 3 example queries that your database should support (in English, not SQL)** \
+Query 1: List all students who are members of a particular club. \
+Query 2: Show all upcoming events for a particular club and the rooms reserved for them. \
+Query 3: Find all club expenses for a given year and calculate the total amount spent by each club.
 
 <details>
 <details>
