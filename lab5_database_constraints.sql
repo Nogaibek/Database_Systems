@@ -34,25 +34,16 @@ CREATE TABLE bookings (
 
 INSERT INTO employees VALUES
     (1, 'Alice', 'Smith', 18, 1500),
-    (2, 'Bob', 'Jones', 65, 2500);
+    (2, 'Bob', 'Jones', 65, 2500),
+    (3, 'Test', 'User', 17, 100);
 INSERT INTO products_catalog VALUES
     (1, 'Laptop', 1000, 900),
-    (2, 'Phone', 500, 450);
+    (2, 'Phone', 500, 450), 
+    (3, 'Mouse', 25, 100);
 INSERT INTO bookings VALUES
     (1, '2026-10-01', '2026-10-03', 1),
-    (2, '2026-10-05', '2026-10-08', 10);
--- INSERT INTO employees VALUES (3, 'Test', 'User', 17, 100);
--- INSERT INTO employees VALUES (3, 'Test', 'User', 66, 100);
--- INSERT INTO employees VALUES (3, 'Test', 'User', 25, 0);
--- INSERT INTO employees VALUES (3, 'Test', 'User', 25, -1);
--- INSERT INTO products_catalog VALUES (3, 'Test', 0, 1);
--- INSERT INTO products_catalog VALUES (3, 'Test', 100, 0);
--- INSERT INTO products_catalog VALUES (3, 'Test', 100, 100);
--- INSERT INTO products_catalog VALUES (3, 'Test', 100, 110);
--- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 0);
--- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 11);
--- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-01', 2);
--- INSERT INTO bookings VALUES (3, '2026-10-03', '2026-10-01', 2);
+    (2, '2026-10-05', '2026-10-08', 10), 
+    (3, '2026-10-01', '2026-09-03', 11);
 
 -- 2.1
 
@@ -77,18 +68,11 @@ CREATE TABLE inventory (
 
 INSERT INTO customers VALUES
     (1, 'alice@example.com', '+77010000001', '2026-10-01'),
-    (2, 'bob@example.com', NULL, '2026-10-02');
+    (2, NULL, '+77010000002', '2026-10-02'),
+    (3, 'charlie@example.com', NULL, '2026-10-03');
 INSERT INTO inventory VALUES
     (1, 'Laptop', 10, 1000, '2026-10-01 09:00:00'),
-    (2, 'Phone', 0, 500, '2026-10-02 10:00:00');
--- INSERT INTO customers VALUES (NULL, 'test@example.com', '123', '2026-10-03');
--- INSERT INTO customers VALUES (3, NULL, '123', '2026-10-03');
--- INSERT INTO customers VALUES (3, 'test@example.com', '123', NULL);
--- INSERT INTO inventory VALUES (NULL, 'Test', 1, 100, '2026-10-03 12:00:00');
--- INSERT INTO inventory VALUES (3, NULL, 1, 100, '2026-10-03 12:00:00');
--- INSERT INTO inventory VALUES (3, 'Test', NULL, 100, '2026-10-03 12:00:00');
--- INSERT INTO inventory VALUES (3, 'Test', 1, NULL, '2026-10-03 12:00:00');
--- INSERT INTO inventory VALUES (3, 'Test', 1, 100, NULL);
+    (2, NULL, -1, 0, NULL);
 
 -- 3.1
 
@@ -117,9 +101,7 @@ ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (username);
 ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
 INSERT INTO users VALUES
     (1, 'alice', 'alice@example.com', CURRENT_TIMESTAMP),
-    (2, 'bob', 'bob@example.com', CURRENT_TIMESTAMP);
--- INSERT INTO users VALUES (5, 'alice', 'other@example.com', CURRENT_TIMESTAMP);
--- INSERT INTO users VALUES (5, 'other', 'alice@example.com', CURRENT_TIMESTAMP);
+    (2, 'bob', 'alice@example.com', CURRENT_TIMESTAMP);
 
 -- 4.1
 
@@ -130,10 +112,9 @@ CREATE TABLE departments (
 );
 INSERT INTO departments VALUES
     (1, 'IT', 'Almaty'),
+    (1, 'HR', 'Astana'),
     (2, 'Finance', 'Astana'),
-    (3, 'HR', 'Almaty');
--- INSERT INTO departments VALUES (1, 'Sales', 'Astana');
--- INSERT INTO departments VALUES (NULL, 'Sales', 'Astana');
+    (NULL, 'HR', 'Almaty');
 
 -- 4.2
 
@@ -147,13 +128,22 @@ CREATE TABLE student_courses (
 
 -- 4.3
 
-SELECT question, answer
-FROM (VALUES
-    (1, 'UNIQUE запрещает повторение ненулевых значений или комбинаций столбцов. В PostgreSQL 14 по умолчанию NULL не считается равным NULL, поэтому UNIQUE допускает несколько NULL. PRIMARY KEY объединяет уникальность и NOT NULL для каждого столбца ключа и задаёт основной идентификатор строки. Оба ограничения создают уникальный индекс; внешний ключ может ссылаться как на PRIMARY KEY, так и на подходящий UNIQUE.'),
-    (2, 'Одностолбцовый PRIMARY KEY подходит, когда строка имеет один устойчивый уникальный идентификатор, например dept_id. Составной PRIMARY KEY нужен, когда уникальна именно комбинация, например (student_id, course_id) в таблице связей: каждый компонент отдельно может повторяться. Составной ключ прямо отражает предметную область, но требует хранить все его столбцы в ссылающихся внешних ключах. При использовании отдельного идентификатора естественную уникальность комбинации следует сохранить через UNIQUE.'),
-    (3, 'PRIMARY KEY обозначает выбранный основной ключ таблицы, поэтому PostgreSQL разрешает только одно такое ограничение; оно может включать несколько столбцов. Другие независимые кандидатные ключи задаются отдельными UNIQUE, например username и email. Несколько UNIQUE защищают разные правила уникальности, а один PRIMARY KEY однозначно определяет основной идентификатор строки и используется как цель REFERENCES, если список столбцов не указан.')
-) AS comparison(question, answer)
-ORDER BY question;
+-- 1
+-- UNIQUE запрещает повторение ненулевых значений или комбинаций столбцов
+-- В PostgreSQL 14 по умолчанию NULL не считается равным NULL, поэтому UNIQUE допускает несколько NULL
+-- PRIMARY KEY объединяет уникальность и NOT NULL для каждого столбца ключа и задаёт основной идентификатор строки
+-- Оба ограничения создают уникальный индекс; внешний ключ может ссылаться как на PRIMARY KEY, так и на подходящий UNIQUE
+
+-- 2
+-- Одностолбцовый PRIMARY KEY подходит, когда строка имеет один устойчивый уникальный идентификатор, например dept_id
+-- Составной PRIMARY KEY нужен, когда уникальна именно комбинация, например (student_id, course_id) в таблице связей: каждый компонент отдельно может повторяться
+-- Составной ключ прямо отражает предметную область, но требует хранить все его столбцы в ссылающихся внешних ключах
+-- При использовании отдельного идентификатора естественную уникальность комбинации следует сохранить через UNIQUE
+
+-- 3
+-- PRIMARY KEY обозначает выбранный основной ключ таблицы, поэтому PostgreSQL разрешает только одно такое ограничение, оно может включать несколько столбцов
+-- Другие независимые кандидатные ключи задаются отдельными UNIQUE, например username и email
+-- Несколько UNIQUE защищают разные правила уникальности, а один PRIMARY KEY однозначно определяет основной идентификатор строки и используется как цель REFERENCES, если список столбцов не указан
 
 -- 5.1
 
@@ -166,7 +156,6 @@ CREATE TABLE employees_dept (
 INSERT INTO employees_dept VALUES
     (1, 'Alice Smith', 1, '2026-01-10'),
     (2, 'Bob Jones', 2, '2026-02-15');
--- INSERT INTO employees_dept VALUES (3, 'Test User', 999, CURRENT_DATE);
 
 -- 5.2
 
@@ -223,7 +212,6 @@ INSERT INTO categories VALUES (1, 'Electronics'), (2, 'Accessories');
 INSERT INTO products_fk VALUES (1, 'Laptop', 1), (2, 'Mouse', 2);
 INSERT INTO orders VALUES (1, '2026-10-01'), (2, '2026-10-02');
 INSERT INTO order_items VALUES (1, 1, 1, 1), (2, 1, 2, 2), (3, 2, 2, 1);
--- DELETE FROM categories WHERE category_id = 1;
 SELECT * FROM order_items ORDER BY item_id;
 DELETE FROM orders WHERE order_id = 1;
 SELECT * FROM order_items ORDER BY item_id;
@@ -282,40 +270,7 @@ INSERT INTO order_details VALUES
     (3, 3, 3, 3, 25),
     (4, 4, 4, 2, 50),
     (5, 5, 5, 1, 0);
--- INSERT INTO ecom_customers VALUES (NULL, 'Test', 'test@example.com', NULL, '2026-10-11');
--- INSERT INTO ecom_customers VALUES (6, NULL, 'test@example.com', NULL, '2026-10-11');
--- INSERT INTO ecom_customers VALUES (6, 'Test', NULL, NULL, '2026-10-11');
--- INSERT INTO ecom_customers VALUES (6, 'Test', 'test@example.com', NULL, NULL);
--- INSERT INTO ecom_customers VALUES (1, 'Test', 'test@example.com', NULL, '2026-10-11');
--- INSERT INTO ecom_products VALUES (NULL, 'Test', NULL, 100, 1);
--- INSERT INTO ecom_products VALUES (6, NULL, NULL, 100, 1);
--- INSERT INTO ecom_products VALUES (6, 'Test', NULL, NULL, 1);
--- INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, NULL);
--- INSERT INTO ecom_products VALUES (1, 'Test', NULL, 100, 1);
--- INSERT INTO ecom_orders VALUES (NULL, 1, '2026-10-11', 100, 'pending');
--- INSERT INTO ecom_orders VALUES (6, NULL, '2026-10-11', 100, 'pending');
--- INSERT INTO ecom_orders VALUES (6, 1, NULL, 100, 'pending');
--- INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', NULL, 'pending');
--- INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', 100, NULL);
--- INSERT INTO ecom_orders VALUES (1, 1, '2026-10-11', 100, 'pending');
--- INSERT INTO order_details VALUES (NULL, 1, 1, 1, 100);
--- INSERT INTO order_details VALUES (6, NULL, 1, 1, 100);
--- INSERT INTO order_details VALUES (6, 1, NULL, 1, 100);
--- INSERT INTO order_details VALUES (6, 1, 1, NULL, 100);
--- INSERT INTO order_details VALUES (6, 1, 1, 1, NULL);
--- INSERT INTO order_details VALUES (1, 1, 1, 1, 100);
--- INSERT INTO ecom_customers VALUES (6, 'Test', 'alice@example.com', NULL, CURRENT_DATE);
--- INSERT INTO ecom_products VALUES (6, 'Test', NULL, -1, 1);
--- INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, -1);
--- INSERT INTO ecom_orders VALUES (6, 999, CURRENT_DATE, 100, 'pending');
--- INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, -1, 'pending');
--- INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, 100, 'unknown');
--- INSERT INTO order_details VALUES (6, 999, 1, 1, 100);
--- INSERT INTO order_details VALUES (6, 1, 999, 1, 100);
--- INSERT INTO order_details VALUES (6, 1, 1, 0, 100);
--- INSERT INTO order_details VALUES (6, 1, 1, 1, -1);
--- DELETE FROM ecom_customers WHERE customer_id = 1;
--- DELETE FROM ecom_products WHERE product_id = 1;
+
 BEGIN;
 DELETE FROM ecom_orders WHERE order_id = 1;
 SELECT COUNT(*) AS remaining_details_for_deleted_order FROM order_details WHERE order_id = 1;
