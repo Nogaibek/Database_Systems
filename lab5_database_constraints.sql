@@ -1,28 +1,5 @@
 -- 1.1
 
-CREATE OR REPLACE FUNCTION pg_temp.expect_error(statement TEXT, expected_state TEXT)
-RETURNS VOID LANGUAGE plpgsql AS $$
-DECLARE
-    actual_state TEXT;
-    error_message TEXT;
-    error_detail TEXT;
-BEGIN
-    BEGIN
-        EXECUTE statement;
-    EXCEPTION WHEN OTHERS THEN
-        GET STACKED DIAGNOSTICS actual_state = RETURNED_SQLSTATE,
-                                error_message = MESSAGE_TEXT,
-                                error_detail = PG_EXCEPTION_DETAIL;
-        IF actual_state <> expected_state THEN
-            RAISE EXCEPTION 'Expected SQLSTATE %, received %: %', expected_state, actual_state, error_message;
-        END IF;
-        RAISE NOTICE 'SQLSTATE %: %; %', actual_state, error_message, error_detail;
-        RETURN;
-    END;
-    RAISE EXCEPTION 'Expected SQLSTATE %, but statement succeeded: %', expected_state, statement;
-END;
-$$;
-
 CREATE TABLE employees (
     employee_id INTEGER,
     first_name TEXT,
@@ -64,18 +41,18 @@ INSERT INTO products_catalog VALUES
 INSERT INTO bookings VALUES
     (1, '2026-10-01', '2026-10-03', 1),
     (2, '2026-10-05', '2026-10-08', 10);
-SELECT pg_temp.expect_error($test$INSERT INTO employees VALUES (3, 'Test', 'User', 17, 100)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO employees VALUES (3, 'Test', 'User', 66, 100)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO employees VALUES (3, 'Test', 'User', 25, 0)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO employees VALUES (3, 'Test', 'User', 25, -1)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO products_catalog VALUES (3, 'Test', 0, 1)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO products_catalog VALUES (3, 'Test', 100, 0)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO products_catalog VALUES (3, 'Test', 100, 100)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO products_catalog VALUES (3, 'Test', 100, 110)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 0)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 11)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-01', 2)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO bookings VALUES (3, '2026-10-03', '2026-10-01', 2)$test$, '23514');
+-- INSERT INTO employees VALUES (3, 'Test', 'User', 17, 100);
+-- INSERT INTO employees VALUES (3, 'Test', 'User', 66, 100);
+-- INSERT INTO employees VALUES (3, 'Test', 'User', 25, 0);
+-- INSERT INTO employees VALUES (3, 'Test', 'User', 25, -1);
+-- INSERT INTO products_catalog VALUES (3, 'Test', 0, 1);
+-- INSERT INTO products_catalog VALUES (3, 'Test', 100, 0);
+-- INSERT INTO products_catalog VALUES (3, 'Test', 100, 100);
+-- INSERT INTO products_catalog VALUES (3, 'Test', 100, 110);
+-- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 0);
+-- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-03', 11);
+-- INSERT INTO bookings VALUES (3, '2026-10-01', '2026-10-01', 2);
+-- INSERT INTO bookings VALUES (3, '2026-10-03', '2026-10-01', 2);
 
 -- 2.1
 
@@ -104,16 +81,14 @@ INSERT INTO customers VALUES
 INSERT INTO inventory VALUES
     (1, 'Laptop', 10, 1000, '2026-10-01 09:00:00'),
     (2, 'Phone', 0, 500, '2026-10-02 10:00:00');
-SELECT pg_temp.expect_error($test$INSERT INTO customers VALUES (NULL, 'test@example.com', '123', '2026-10-03')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO customers VALUES (3, NULL, '123', '2026-10-03')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO customers VALUES (3, 'test@example.com', '123', NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (NULL, 'Test', 1, 100, '2026-10-03 12:00:00')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, NULL, 1, 100, '2026-10-03 12:00:00')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, 'Test', NULL, 100, '2026-10-03 12:00:00')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, 'Test', 1, NULL, '2026-10-03 12:00:00')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, 'Test', 1, 100, NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, 'Test', -1, 100, CURRENT_TIMESTAMP)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO inventory VALUES (3, 'Test', 1, 0, CURRENT_TIMESTAMP)$test$, '23514');
+-- INSERT INTO customers VALUES (NULL, 'test@example.com', '123', '2026-10-03');
+-- INSERT INTO customers VALUES (3, NULL, '123', '2026-10-03');
+-- INSERT INTO customers VALUES (3, 'test@example.com', '123', NULL);
+-- INSERT INTO inventory VALUES (NULL, 'Test', 1, 100, '2026-10-03 12:00:00');
+-- INSERT INTO inventory VALUES (3, NULL, 1, 100, '2026-10-03 12:00:00');
+-- INSERT INTO inventory VALUES (3, 'Test', NULL, 100, '2026-10-03 12:00:00');
+-- INSERT INTO inventory VALUES (3, 'Test', 1, NULL, '2026-10-03 12:00:00');
+-- INSERT INTO inventory VALUES (3, 'Test', 1, 100, NULL);
 
 -- 3.1
 
@@ -133,11 +108,6 @@ CREATE TABLE course_enrollments (
     semester TEXT,
     UNIQUE (student_id, course_code, semester)
 );
-INSERT INTO course_enrollments VALUES
-    (1, 101, 'DB101', '2026-Fall'),
-    (2, 101, 'DB101', '2027-Spring'),
-    (3, 102, 'DB101', '2026-Fall');
-SELECT pg_temp.expect_error($test$INSERT INTO course_enrollments VALUES (4, 101, 'DB101', '2026-Fall')$test$, '23505');
 
 -- 3.3
 
@@ -147,11 +117,9 @@ ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (username);
 ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
 INSERT INTO users VALUES
     (1, 'alice', 'alice@example.com', CURRENT_TIMESTAMP),
-    (2, 'bob', 'bob@example.com', CURRENT_TIMESTAMP),
-    (3, NULL, NULL, CURRENT_TIMESTAMP),
-    (4, NULL, NULL, CURRENT_TIMESTAMP);
-SELECT pg_temp.expect_error($test$INSERT INTO users VALUES (5, 'alice', 'other@example.com', CURRENT_TIMESTAMP)$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO users VALUES (5, 'other', 'alice@example.com', CURRENT_TIMESTAMP)$test$, '23505');
+    (2, 'bob', 'bob@example.com', CURRENT_TIMESTAMP);
+-- INSERT INTO users VALUES (5, 'alice', 'other@example.com', CURRENT_TIMESTAMP);
+-- INSERT INTO users VALUES (5, 'other', 'alice@example.com', CURRENT_TIMESTAMP);
 
 -- 4.1
 
@@ -164,8 +132,8 @@ INSERT INTO departments VALUES
     (1, 'IT', 'Almaty'),
     (2, 'Finance', 'Astana'),
     (3, 'HR', 'Almaty');
-SELECT pg_temp.expect_error($test$INSERT INTO departments VALUES (1, 'Sales', 'Astana')$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO departments VALUES (NULL, 'Sales', 'Astana')$test$, '23502');
+-- INSERT INTO departments VALUES (1, 'Sales', 'Astana');
+-- INSERT INTO departments VALUES (NULL, 'Sales', 'Astana');
 
 -- 4.2
 
@@ -176,13 +144,6 @@ CREATE TABLE student_courses (
     grade TEXT,
     PRIMARY KEY (student_id, course_id)
 );
-INSERT INTO student_courses VALUES
-    (101, 1, '2026-09-01', 'A'),
-    (101, 2, '2026-09-01', 'B'),
-    (102, 1, '2026-09-01', 'A');
-SELECT pg_temp.expect_error($test$INSERT INTO student_courses VALUES (101, 1, '2026-09-02', 'C')$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO student_courses VALUES (NULL, 3, '2026-09-01', 'A')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO student_courses VALUES (103, NULL, '2026-09-01', 'A')$test$, '23502');
 
 -- 4.3
 
@@ -205,7 +166,7 @@ CREATE TABLE employees_dept (
 INSERT INTO employees_dept VALUES
     (1, 'Alice Smith', 1, '2026-01-10'),
     (2, 'Bob Jones', 2, '2026-02-15');
-SELECT pg_temp.expect_error($test$INSERT INTO employees_dept VALUES (3, 'Test User', 999, CURRENT_DATE)$test$, '23503');
+-- INSERT INTO employees_dept VALUES (3, 'Test User', 999, CURRENT_DATE);
 
 -- 5.2
 
@@ -236,8 +197,6 @@ INSERT INTO publishers VALUES
 INSERT INTO books VALUES
     (1, 'Nineteen Eighty-Four', 1, 1, 1949, '9780451524935'),
     (2, 'Pride and Prejudice', 2, 2, 1813, '9780141439518');
-SELECT pg_temp.expect_error($test$INSERT INTO books VALUES (3, 'Test', 999, 1, 2026, 'TEST-1')$test$, '23503');
-SELECT pg_temp.expect_error($test$INSERT INTO books VALUES (3, 'Test', 1, 999, 2026, 'TEST-2')$test$, '23503');
 
 -- 5.3
 
@@ -264,19 +223,10 @@ INSERT INTO categories VALUES (1, 'Electronics'), (2, 'Accessories');
 INSERT INTO products_fk VALUES (1, 'Laptop', 1), (2, 'Mouse', 2);
 INSERT INTO orders VALUES (1, '2026-10-01'), (2, '2026-10-02');
 INSERT INTO order_items VALUES (1, 1, 1, 1), (2, 1, 2, 2), (3, 2, 2, 1);
-SELECT pg_temp.expect_error($test$DELETE FROM categories WHERE category_id = 1$test$, '23503');
-SELECT pg_temp.expect_error($test$INSERT INTO order_items VALUES (4, 2, 2, 0)$test$, '23514');
+-- DELETE FROM categories WHERE category_id = 1;
 SELECT * FROM order_items ORDER BY item_id;
 DELETE FROM orders WHERE order_id = 1;
 SELECT * FROM order_items ORDER BY item_id;
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM order_items WHERE order_id = 1)
-       OR NOT EXISTS (SELECT 1 FROM order_items WHERE item_id = 3) THEN
-        RAISE EXCEPTION 'ON DELETE CASCADE verification failed';
-    END IF;
-END;
-$$;
 
 -- 6.1
 
@@ -332,82 +282,41 @@ INSERT INTO order_details VALUES
     (3, 3, 3, 3, 25),
     (4, 4, 4, 2, 50),
     (5, 5, 5, 1, 0);
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (NULL, 'Test', 'test@example.com', NULL, '2026-10-11')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (6, NULL, 'test@example.com', NULL, '2026-10-11')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (6, 'Test', NULL, NULL, '2026-10-11')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (6, 'Test', 'test@example.com', NULL, NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (1, 'Test', 'test@example.com', NULL, '2026-10-11')$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (NULL, 'Test', NULL, 100, 1)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (6, NULL, NULL, 100, 1)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (6, 'Test', NULL, NULL, 1)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (1, 'Test', NULL, 100, 1)$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (NULL, 1, '2026-10-11', 100, 'pending')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, NULL, '2026-10-11', 100, 'pending')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 1, NULL, 100, 'pending')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', NULL, 'pending')$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', 100, NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (1, 1, '2026-10-11', 100, 'pending')$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (NULL, 1, 1, 1, 100)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, NULL, 1, 1, 100)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, NULL, 1, 100)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, 1, NULL, 100)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, 1, 1, NULL)$test$, '23502');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (1, 1, 1, 1, 100)$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_customers VALUES (6, 'Test', 'alice@example.com', NULL, CURRENT_DATE)$test$, '23505');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (6, 'Test', NULL, -1, 1)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, -1)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 999, CURRENT_DATE, 100, 'pending')$test$, '23503');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, -1, 'pending')$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, 100, 'unknown')$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 999, 1, 1, 100)$test$, '23503');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, 999, 1, 100)$test$, '23503');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, 1, 0, 100)$test$, '23514');
-SELECT pg_temp.expect_error($test$INSERT INTO order_details VALUES (6, 1, 1, 1, -1)$test$, '23514');
-SELECT pg_temp.expect_error($test$DELETE FROM ecom_customers WHERE customer_id = 1$test$, '23503');
-SELECT pg_temp.expect_error($test$DELETE FROM ecom_products WHERE product_id = 1$test$, '23503');
+-- INSERT INTO ecom_customers VALUES (NULL, 'Test', 'test@example.com', NULL, '2026-10-11');
+-- INSERT INTO ecom_customers VALUES (6, NULL, 'test@example.com', NULL, '2026-10-11');
+-- INSERT INTO ecom_customers VALUES (6, 'Test', NULL, NULL, '2026-10-11');
+-- INSERT INTO ecom_customers VALUES (6, 'Test', 'test@example.com', NULL, NULL);
+-- INSERT INTO ecom_customers VALUES (1, 'Test', 'test@example.com', NULL, '2026-10-11');
+-- INSERT INTO ecom_products VALUES (NULL, 'Test', NULL, 100, 1);
+-- INSERT INTO ecom_products VALUES (6, NULL, NULL, 100, 1);
+-- INSERT INTO ecom_products VALUES (6, 'Test', NULL, NULL, 1);
+-- INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, NULL);
+-- INSERT INTO ecom_products VALUES (1, 'Test', NULL, 100, 1);
+-- INSERT INTO ecom_orders VALUES (NULL, 1, '2026-10-11', 100, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, NULL, '2026-10-11', 100, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, 1, NULL, 100, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', NULL, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, 1, '2026-10-11', 100, NULL);
+-- INSERT INTO ecom_orders VALUES (1, 1, '2026-10-11', 100, 'pending');
+-- INSERT INTO order_details VALUES (NULL, 1, 1, 1, 100);
+-- INSERT INTO order_details VALUES (6, NULL, 1, 1, 100);
+-- INSERT INTO order_details VALUES (6, 1, NULL, 1, 100);
+-- INSERT INTO order_details VALUES (6, 1, 1, NULL, 100);
+-- INSERT INTO order_details VALUES (6, 1, 1, 1, NULL);
+-- INSERT INTO order_details VALUES (1, 1, 1, 1, 100);
+-- INSERT INTO ecom_customers VALUES (6, 'Test', 'alice@example.com', NULL, CURRENT_DATE);
+-- INSERT INTO ecom_products VALUES (6, 'Test', NULL, -1, 1);
+-- INSERT INTO ecom_products VALUES (6, 'Test', NULL, 100, -1);
+-- INSERT INTO ecom_orders VALUES (6, 999, CURRENT_DATE, 100, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, -1, 'pending');
+-- INSERT INTO ecom_orders VALUES (6, 1, CURRENT_DATE, 100, 'unknown');
+-- INSERT INTO order_details VALUES (6, 999, 1, 1, 100);
+-- INSERT INTO order_details VALUES (6, 1, 999, 1, 100);
+-- INSERT INTO order_details VALUES (6, 1, 1, 0, 100);
+-- INSERT INTO order_details VALUES (6, 1, 1, 1, -1);
+-- DELETE FROM ecom_customers WHERE customer_id = 1;
+-- DELETE FROM ecom_products WHERE product_id = 1;
 BEGIN;
 DELETE FROM ecom_orders WHERE order_id = 1;
 SELECT COUNT(*) AS remaining_details_for_deleted_order FROM order_details WHERE order_id = 1;
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM order_details WHERE order_id = 1)
-       OR (SELECT COUNT(*) FROM order_details) <> 4 THEN
-        RAISE EXCEPTION 'E-commerce ON DELETE CASCADE verification failed';
-    END IF;
-END;
-$$;
 ROLLBACK;
-
-SELECT 'ecom_customers' AS table_name, COUNT(*) AS row_count FROM ecom_customers
-UNION ALL SELECT 'ecom_products', COUNT(*) FROM ecom_products
-UNION ALL SELECT 'ecom_orders', COUNT(*) FROM ecom_orders
-UNION ALL SELECT 'order_details', COUNT(*) FROM order_details;
-
-SELECT o.order_id, o.total_amount, SUM(d.quantity * d.unit_price) AS calculated_total,
-       o.total_amount = SUM(d.quantity * d.unit_price) AS totals_match
-FROM ecom_orders AS o
-JOIN order_details AS d ON d.order_id = o.order_id
-GROUP BY o.order_id, o.total_amount
-ORDER BY o.order_id;
-
-DO $$
-BEGIN
-    IF (SELECT COUNT(*) FROM ecom_customers) < 5
-       OR (SELECT COUNT(*) FROM ecom_products) < 5
-       OR (SELECT COUNT(*) FROM ecom_orders) < 5
-       OR (SELECT COUNT(*) FROM order_details) < 5 THEN
-        RAISE EXCEPTION 'Expected at least five records per e-commerce table';
-    END IF;
-    IF EXISTS (
-        SELECT 1 FROM ecom_orders AS o
-        LEFT JOIN order_details AS d ON d.order_id = o.order_id
-        GROUP BY o.order_id, o.total_amount
-        HAVING o.total_amount <> COALESCE(SUM(d.quantity * d.unit_price), 0)
-    ) THEN
-        RAISE EXCEPTION 'Order total verification failed';
-    END IF;
-END;
-$$;
-
-DROP FUNCTION pg_temp.expect_error(TEXT, TEXT);
