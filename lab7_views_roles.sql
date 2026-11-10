@@ -55,7 +55,7 @@ JOIN departments AS d ON d.dept_id = e.dept_id;
 
 SELECT * FROM employee_details ORDER BY emp_name;
 
-SELECT 'Tom Brown is excluded because his dept_id is NULL and the INNER JOIN requires a matching department.' AS explanation;
+-- Tom Brown is excluded because his dept_id is NULL and the INNER JOIN requires a matching department
 
 -- 2.2
 CREATE VIEW dept_statistics AS
@@ -203,7 +203,8 @@ COMMIT;
 
 REFRESH MATERIALIZED VIEW CONCURRENTLY public.dept_summary_mv;
 
-SELECT 'CONCURRENTLY lets other sessions read the previous snapshot during the refresh. It requires a populated view and a unique index covering all rows on plain columns.' AS explanation;
+-- CONCURRENTLY lets other sessions read the previous snapshot during the refresh
+-- It requires a populated view and a unique index covering all rows on plain columns
 
 -- 5.4
 BEGIN;

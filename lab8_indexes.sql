@@ -58,7 +58,8 @@ ORDER BY tablename, indexname;
 -- 2.2
 CREATE INDEX emp_dept_idx ON employees (dept_id);
 
-SELECT 'An index on the referencing dept_id helps PostgreSQL find matching employees for selective joins, parent-key checks and cascading updates or deletes. The foreign key declaration does not create this index automatically.' AS explanation;
+-- An index on the referencing dept_id helps PostgreSQL find matching employees for selective joins, parent-key checks and cascading updates or deletes
+-- The foreign key declaration does not create this index automatically
 
 -- 2.3
 SELECT i.tablename, i.indexname, i.indexdef,
@@ -89,7 +90,9 @@ SELECT emp_id, emp_name, salary
 FROM employees
 WHERE dept_id = 101 AND salary >= 55000;
 
-SELECT 'The leftmost key dept_id identifies a contiguous slice of the B-tree. Within that slice the salary bound narrows the scan. A filter on dept_id alone can also use the prefix.' AS explanation;
+-- The leftmost key dept_id identifies a contiguous slice of the B-tree
+-- Within that slice the salary bound narrows the scan
+-- A filter on dept_id alone can also use the prefix
 
 -- 3.2
 CREATE INDEX emp_salary_dept_idx ON employees (salary, dept_id);
@@ -99,7 +102,9 @@ SELECT emp_id, emp_name
 FROM employees
 WHERE salary BETWEEN 55000 AND 70000 AND dept_id = 101;
 
-SELECT 'With salary first, the index is ordered by salary across all departments. A salary range can span multiple departments. Putting dept_id first limits this query to a single department before applying the salary range.' AS explanation;
+-- With salary first, the index is ordered by salary across all departments
+-- A salary range can span multiple departments
+-- Putting dept_id first limits this query to a single department before applying the salary range
 
 -- 4.1
 ALTER TABLE employees ADD COLUMN email VARCHAR(254);
@@ -131,7 +136,8 @@ WHERE i.schemaname = 'public' AND i.tablename = 'employees'
   AND i.indexname IN ('emp_email_unique_idx', 'employees_phone_key')
 ORDER BY i.indexname;
 
-SELECT 'Both definitions enforce uniqueness with a unique B-tree. The phone constraint also has a pg_constraint entry and owns its backing index.' AS explanation;
+-- Both definitions enforce uniqueness with a unique B-tree
+-- The phone constraint also has a pg_constraint entry and owns its backing index
 
 -- 5.1
 CREATE INDEX emp_salary_desc_idx ON employees (salary DESC);
@@ -145,7 +151,8 @@ ORDER BY salary DESC;
 
 SET LOCAL enable_seqscan = DEFAULT;
 
-SELECT 'An ordered B-tree scan can return salaries in descending order without a separate Sort. PostgreSQL can also scan the ascending single-column index backward for this order.' AS explanation;
+-- An ordered B-tree scan can return salaries in descending order without a separate Sort
+-- PostgreSQL can also scan the ascending single-column index backward for this order
 
 -- 5.2
 CREATE INDEX proj_budget_nulls_first_idx ON projects (budget NULLS FIRST);
@@ -170,7 +177,8 @@ SELECT emp_id, emp_name
 FROM employees
 WHERE LOWER(emp_name) = LOWER('JOHN SMITH');
 
-SELECT 'The index stores LOWER(emp_name). An equality predicate using that expression can look up the normalized value directly.' AS explanation;
+-- The index stores LOWER(emp_name)
+-- An equality predicate using that expression can look up the normalized value directly
 
 -- 6.2
 ALTER TABLE employees ADD COLUMN hire_date DATE;
@@ -196,12 +204,15 @@ ALTER INDEX emp_salary_idx RENAME TO employees_salary_index;
 -- 7.2
 DROP INDEX emp_salary_dept_idx;
 
-SELECT 'The lab retains the salary index and the department-first composite index. Removing the unused salary-first composite index saves storage and avoids maintaining its entries on writes.' AS explanation;
+-- The lab retains the salary index and the department-first composite index
+-- Removing the unused salary-first composite index saves storage and avoids maintaining its entries on writes
 
 -- 7.3
 REINDEX INDEX employees_salary_index;
 
-SELECT 'REINDEX rebuilds an index after significant bloat or damage. A large bulk change can justify a rebuild if measurements show excessive bloat. ANALYZE refreshes planner statistics.' AS explanation;
+-- REINDEX rebuilds an index after significant bloat or damage
+-- A large bulk change can justify a rebuild if measurements show excessive bloat
+-- ANALYZE refreshes planner statistics
 
 -- 8.1
 ANALYZE departments;
@@ -223,7 +234,9 @@ FROM employees AS e
 JOIN departments AS d ON d.dept_id = e.dept_id
 WHERE d.dept_id IN (101, 103) AND e.salary > 60000;
 
-SELECT 'The partial index stores only employees above 60000. The included name can support an index-only scan of employees when visibility permits. The planner may still choose a sequential scan on the sample data.' AS explanation;
+-- The partial index stores only employees above 60000 
+-- The included name can support an index-only scan of employees when visibility permits
+-- The planner may still choose a sequential scan on the sample data
 
 -- 8.2
 CREATE INDEX proj_high_budget_idx ON projects (budget)
@@ -234,7 +247,9 @@ FROM projects
 WHERE budget > 80000
 ORDER BY budget;
 
-SELECT 'Indexing only qualifying projects reduces the number of entries. On a larger table this can reduce disk and cache usage. PostgreSQL can use the index when the query predicate implies budget > 80000.' AS explanation;
+-- Indexing only qualifying projects reduces the number of entries
+-- On a larger table this can reduce disk and cache usage
+-- PostgreSQL can use the index when the query predicate implies budget > 80000
 
 -- 8.3
 EXPLAIN (ANALYZE, BUFFERS, TIMING OFF)
@@ -247,7 +262,9 @@ SELECT emp_name, salary FROM employees WHERE salary > 60000;
 
 SET LOCAL enable_seqscan = DEFAULT;
 
-SELECT 'For a small table it can be cheaper to read its few pages in sequence. Temporarily discouraging sequential scans shows an available index plan. The actual costs and buffers depend on the data and server.' AS explanation;
+-- For a small table it can be cheaper to read its few pages in sequence
+-- Temporarily discouraging sequential scans shows an available index plan
+-- The actual costs and buffers depend on the data and server
 
 -- 9.1
 CREATE INDEX dept_name_hash_idx ON departments USING hash (dept_name);
@@ -258,7 +275,7 @@ EXPLAIN SELECT * FROM departments WHERE dept_name = 'IT';
 
 SET LOCAL enable_seqscan = DEFAULT;
 
-SELECT 'Hash indexes are suited to exact equality lookups, such as finding a department by its full name.' AS explanation;
+-- Hash indexes are suited to exact equality lookups, such as finding a department by its full name
 
 -- 9.2
 CREATE INDEX proj_name_hash_idx ON projects USING hash (project_name);
@@ -277,7 +294,9 @@ EXPLAIN SELECT * FROM projects WHERE project_name > 'Database';
 
 SET LOCAL enable_seqscan = DEFAULT;
 
-SELECT 'Both index types can serve equality. The B-tree preserves key order and supports the greater-than predicate. The hash index cannot serve that predicate.' AS explanation;
+-- Both index types can serve equality
+-- The B-tree preserves key order and supports the greater-than predicate
+-- The hash index cannot serve that predicate
 
 -- 10.1
 SELECT tbl.relname AS table_name, idx.relname AS index_name,
@@ -292,7 +311,8 @@ JOIN pg_am AS am ON am.oid = idx.relam
 WHERE n.nspname = 'public'
 ORDER BY size_bytes DESC, index_name;
 
-SELECT 'A hash index allocates a metapage, bucket pages and, when needed, overflow and bitmap pages. Its initial page allocation differs from the root and leaf page layout of a B-tree.' AS explanation;
+-- A hash index allocates a metapage, bucket pages and, when needed, overflow and bitmap pages
+-- Its initial page allocation differs from the root and leaf page layout of a B-tree
 
 -- 10.2
 DROP INDEX proj_name_hash_idx;
@@ -319,20 +339,3 @@ JOIN (VALUES
 WHERE i.schemaname = 'public';
 
 SELECT * FROM index_documentation ORDER BY table_name, index_name;
-
--- 1
-SELECT 'B-tree is the default PostgreSQL index type.' AS answer;
-
--- 2
-SELECT 'Create an index for frequent selective lookups, repeated joins on large tables, or sorting that benefits from index order, especially ORDER BY with LIMIT.' AS answer;
-
--- 3
-SELECT 'Indexes are often unnecessary for tiny tables and for write-heavy tables when the indexed keys rarely serve useful queries.' AS answer;
-
--- 4
-SELECT 'Inserts, deletes and updates can require extra index maintenance, WAL and vacuum work. Updates that qualify for HOT can avoid creating new index entries.' AS answer;
-
--- 5
-SELECT 'Use EXPLAIN to inspect the selected plan. EXPLAIN (ANALYZE, BUFFERS) runs the query and reports actual rows and buffer use. Look for Index Scan, Index Only Scan or Bitmap Index Scan and the relevant index name.' AS answer;
-
-COMMIT;
