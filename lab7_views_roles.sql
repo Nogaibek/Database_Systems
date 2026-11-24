@@ -203,9 +203,6 @@ COMMIT;
 
 REFRESH MATERIALIZED VIEW CONCURRENTLY public.dept_summary_mv;
 
--- CONCURRENTLY lets other sessions read the previous snapshot during the refresh
--- It requires a populated view and a unique index covering all rows on plain columns
-
 -- 5.4
 BEGIN;
 
