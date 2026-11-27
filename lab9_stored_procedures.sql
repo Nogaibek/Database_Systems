@@ -91,7 +91,6 @@ END;
 $$;
 SELECT rental_id, rental_days(rental_id) AS days FROM rentals WHERE rental_id = 19;
 SELECT rental_days(999) AS missing_rental_days;
--- Rental 19 exists but end_date is NULL, so date subtraction yields NULL; 999 finds no row, leaving SELECT INTO target NULL.
 
 -- 2.2
 CREATE OR REPLACE FUNCTION member_rental_count(p_member_id INT)
@@ -99,7 +98,6 @@ RETURNS BIGINT LANGUAGE sql AS $$
     SELECT COUNT(*) FROM rentals WHERE member_id = p_member_id
 $$;
 SELECT member_id, member_rental_count(member_id) FROM members ORDER BY member_id;
--- COUNT is an aggregate over an empty set and returns 0; scalar SELECT INTO with no matching row instead leaves its target NULL.
 
 -- 2.3
 CREATE OR REPLACE FUNCTION station_city(p_station_id INT)
@@ -135,7 +133,6 @@ LANGUAGE sql AS $$
 $$;
 SELECT member_stats(1);
 SELECT * FROM member_stats(1);
--- SELECT function() returns one composite value; SELECT * FROM function() expands OUT fields into separate columns.
 
 -- 3.3
 CREATE OR REPLACE FUNCTION apply_late_fee(INOUT p_fee NUMERIC)
@@ -145,7 +142,6 @@ BEGIN
 END;
 $$;
 SELECT apply_late_fee(12.50);
--- INOUT is also an output parameter: PL/pgSQL returns its final value at block end without an explicit RETURNS clause or RETURN statement.
 
 -- 3.4
 CREATE OR REPLACE FUNCTION fee_summary(VARIADIC p_fees NUMERIC[])
@@ -154,7 +150,6 @@ LANGUAGE sql IMMUTABLE AS $$
     SELECT COALESCE(SUM(x),0), AVG(x), MAX(x) FROM unnest(p_fees) AS u(x)
 $$;
 SELECT * FROM fee_summary(10, 20, 30);
--- VARIADIC must be last so all remaining positional arguments can be collected into its array; later parameters would have no unambiguous positional boundary.
 
 -- 3.5
 -- IN: pass a member ID to a read-only lookup. INOUT: accept and return a fee after applying a surcharge. VARIADIC: accept any number of fee amounts for a summary. OUT: return several named statistics from one call.
@@ -181,13 +176,10 @@ RETURNS NUMERIC LANGUAGE sql STABLE AS $$
     SELECT COALESCE(SUM(fee),0) FROM rentals
     WHERE member_id = p_member_id AND start_date::date >= p_from_date
 $$;
--- ERROR: function total_fees(integer) is not unique
--- HINT: Could not choose a best candidate function. You might need to add explicit type casts.
 
 -- 4.4
 DROP FUNCTION total_fees(INTEGER);
 SELECT total_fees(1);
--- After dropping the one-argument overload, total_fees(1) resolves to the two-argument function using its DEFAULT date.
 
 -- 4.5
 CREATE OR REPLACE FUNCTION total_fees(p_member_name VARCHAR)
@@ -196,7 +188,6 @@ RETURNS NUMERIC LANGUAGE sql STABLE AS $$
     WHERE m.member_name = p_member_name
 $$;
 SELECT total_fees('Aida Karim'::VARCHAR);
--- Integer and VARCHAR argument types select distinct overloads; an explicit cast can make resolution deterministic when a literal is otherwise unknown.
 
 -- 5
 -- 5.1
@@ -207,7 +198,6 @@ LANGUAGE sql STABLE AS $$
 $$;
 SELECT * FROM find_bikes('%city%');
 SELECT find_bikes('%city%');
--- SELECT * FROM expands each returned row into columns; SELECT function() displays each row as a composite value.
 
 -- 5.2
 CREATE OR REPLACE FUNCTION member_history(p_member_id INT)
@@ -238,7 +228,6 @@ END;
 $$;
 SELECT * FROM member_history_renamed(1);
 SELECT * FROM member_history_qualified(1);
--- A RETURNS TABLE output name that matches an unqualified input column can raise: column reference "rental_id" is ambiguous. Rename output columns or qualify source columns with table aliases.
 
 -- 5.4
 CREATE OR REPLACE FUNCTION station_board(p_city TEXT)
@@ -249,7 +238,6 @@ LANGUAGE sql STABLE AS $$
     WHERE s.city = p_city GROUP BY s.station_id, s.station_name ORDER BY s.station_id
 $$;
 SELECT * FROM station_board('Almaty');
--- Without ::INT, PostgreSQL reports: structure of query does not match function result type; Returned type bigint does not match expected type integer in column 3.
 
 -- 6
 -- 6.1
@@ -261,7 +249,6 @@ BEGIN
     RAISE NOTICE 'Rental rows: %', v_count;
 END rental_report;
 $$;
--- ERROR: mismatched block end label "other_label"
 
 -- 6.2
 DO $$
@@ -277,7 +264,6 @@ BEGIN
     RAISE NOTICE 'Checkpoint 4 outer fee_total=%', fee_total;
 END;
 $$;
--- The inner declaration shadows the outer variable only inside its subblock; after END, the outer value is visible and unchanged.
 
 -- 6.3
 DO $$
@@ -290,7 +276,6 @@ BEGIN
     RAISE NOTICE 'Re-factored value in outer scope: %', outer_value;
 END;
 $$;
--- A subblock variable goes out of scope at END; referencing it outside produces: ERROR: "inner_value" does not exist. Declare it in the enclosing block if it is needed later.
 
 -- 6.4
 CREATE OR REPLACE FUNCTION fee_split(
@@ -327,7 +312,6 @@ LANGUAGE sql STABLE AS $$
     GROUP BY m.member_id, m.member_name ORDER BY revenue DESC, m.member_id LIMIT p_limit
 $$;
 SELECT * FROM top_members();
--- Revenue sums fee amounts, while rental count gives every rental equal weight; a member with fewer high-fee rentals can rank above a frequent low-fee renter.
 
 -- 7.3
 CREATE OR REPLACE FUNCTION rental_invoice(p_rental_id INT)
@@ -339,7 +323,6 @@ LANGUAGE sql STABLE AS $$
     FROM rentals r WHERE r.rental_id = p_rental_id AND r.end_date IS NULL
 $$;
 SELECT * FROM rental_invoice(19);
--- CURRENT_DATE changes over time, so a function that reads it cannot truthfully be IMMUTABLE; STABLE is appropriate within one statement.
 
 -- 7.4
 CREATE OR REPLACE FUNCTION city_report(p_city TEXT)
@@ -359,4 +342,3 @@ LANGUAGE sql STABLE AS $$
 $$;
 SELECT * FROM city_report('Almaty');
 SELECT * FROM city_report('Almaty', DATE '2025-02-01');
--- Putting the date condition in ON preserves stations with zero matching rentals; putting it in WHERE filters out NULL-extended rows and changes the LEFT JOIN into an effective inner join.
